@@ -13,10 +13,20 @@ typedef struct {
     log_gravity_t type;
     char *msg;
 }log_t;
+
+typedef char (*logger_writer_func_t)(char *data, int length);
+
+typedef struct {
+    char id;
+    char enabled;
+    logger_writer_func_t writer;
+}logger_t;
 //------------------------------------
 
 // External function declaration
-char logger_write(log_t *log);
+void logger_module_init();
+char logger_ctor(logger_writer_func_t writer);
+char logger_write(char logger_id, log_t *log);
 //------------------------------------
 
 #endif /* LOGGER__H */
