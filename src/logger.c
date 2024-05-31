@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "logger.h"
+#include <stdio.h>
 
 // Defines
 #define MAX_LOGGER_INSTANCES 1
