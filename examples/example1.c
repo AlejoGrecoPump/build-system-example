@@ -24,5 +24,5 @@ int main(int argc, char **argv)
 char app_writter(char *buff, int length)
 {
     printf("%s", "APP FUNTION WRITER \n");
-    printf("%s", buff);
+    return (char)printf("%s", buff);
 }
