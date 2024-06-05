@@ -10,56 +10,61 @@ target_include_directories(Logger PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
 
 ## Test Framework cmocka
-# Descargo el framework de cmocka
-include(FetchContent)
+# FLAG de compilacion opcional de TESTS
+option(TEST "Compiles test for Logger library" OFF)
 
-FetchContent_Declare(
-    cmocka
-    GIT_REPOSITORY https://git.cryptomilk.org/projects/cmocka.git
-    GIT_TAG        cmocka-1.1.5
-    GIT_SHALLOW    1
-)
-# GIT SHALLOW: Indica que solo se descargará la última versión del historial (en lugar de todo el historial completo).
+if(TEST)
 
-set(WITH_STATIC_LIB ON CACHE BOOL "CMocka: Build with a static library" FORCE) 
-set(WITH_CMOCKERY_SUPPORT OFF CACHE BOOL "CMocka: Install a cmockery header" FORCE)
-set(WITH_EXAMPLES OFF CACHE BOOL "CMocka: Build examples" FORCE)
-set(UNIT_TESTING OFF CACHE BOOL "CMocka: Build with unit testing" FORCE)
-set(PICKY_DEVELOPER OFF CACHE BOOL "CMocka: Build with picky developer flags" FORCE)
-# FORCE sobreescribe si la variable ya fue definida
-# CACHE guarda en la cache de cmack estas opciones para futuras invocaciones
+    # Descargo el framework de cmocka
+    include(FetchContent)
 
-# Descarga y hace disponible cmocka en el proyecto actual (si ya esta descargado solo lo hace disponible)
-FetchContent_MakeAvailable(cmocka)
+    FetchContent_Declare(
+        cmocka
+        GIT_REPOSITORY https://git.cryptomilk.org/projects/cmocka.git
+        GIT_TAG        cmocka-1.1.5
+        GIT_SHALLOW    1
+    )
+    # GIT SHALLOW: Indica que solo se descargará la última versión del historial (en lugar de todo el historial completo).
+
+    set(WITH_STATIC_LIB ON CACHE BOOL "CMocka: Build with a static library" FORCE) 
+    set(WITH_CMOCKERY_SUPPORT OFF CACHE BOOL "CMocka: Install a cmockery header" FORCE)
+    set(WITH_EXAMPLES OFF CACHE BOOL "CMocka: Build examples" FORCE)
+    set(UNIT_TESTING OFF CACHE BOOL "CMocka: Build with unit testing" FORCE)
+    set(PICKY_DEVELOPER OFF CACHE BOOL "CMocka: Build with picky developer flags" FORCE)
+    # FORCE sobreescribe si la variable ya fue definida
+    # CACHE guarda en la cache de cmack estas opciones para futuras invocaciones
+
+    # Descarga y hace disponible cmocka en el proyecto actual (si ya esta descargado solo lo hace disponible)
+    FetchContent_MakeAvailable(cmocka)
 
 
-## Testing
-# Compilo ejecutable del test
-add_executable(test__logger "${PROJECT_SOURCE_DIR}/test/utest/test__logger.c")
-target_compile_features(test__logger PRIVATE c_std_99)
+    ## Testing
+    # Compilo ejecutable del test
+    add_executable(test__logger "${PROJECT_SOURCE_DIR}/test/utest/test__logger.c")
+    target_compile_features(test__logger PRIVATE c_std_99)
 
-# Ejemplo para usar mock cuando se llama a la funcion: logger_other_function -> indica al linker
-# que llame a la funcion wrapper en lugar a la original
-# target_link_options(test__logger PRIVATE -Wl,--wrap=logger_other_function)
+    # Ejemplo para usar mock cuando se llama a la funcion: logger_other_function -> indica al linker
+    # que llame a la funcion wrapper en lugar a la original
+    # target_link_options(test__logger PRIVATE -Wl,--wrap=logger_other_function)
 
-# Linkear el test con cmocka (no linkeo con logger por que incluyo el .c directo en el test)
-target_link_libraries(test__logger PRIVATE cmocka-static)
+    # Linkear el test con cmocka (no linkeo con logger por que incluyo el .c directo en el test)
+    target_link_libraries(test__logger PRIVATE cmocka-static)
 
-# Añadir directorio de los headers de logger (asi encuentra logger.h)
-target_include_directories(test__logger PUBLIC include)
+    # Añadir directorio de los headers de logger (asi encuentra logger.h)
+    target_include_directories(test__logger PUBLIC include)
 
-# Habilito ctest -> soporte para pruebas (cmake reconoce estos binarios como pruebas)
-enable_testing()
+    # Habilito ctest -> soporte para pruebas (cmake reconoce estos binarios como pruebas)
+    enable_testing()
 
-# Agrego los ejecutables de test
-add_test(NAME test__logger COMMAND test__logger)    
-
+    # Agrego los ejecutables de test
+    add_test(NAME test__logger COMMAND test__logger)    
+endif()
 
 ## Examples
 # FLAG de compilacion opcional de ejemplos
-option(COMPILE_EXAMPLES "Compiles user examples for Logger library" OFF)
+option(EXAMPLES "Compiles user examples for Logger library" OFF)
 
-if(COMPILE_EXAMPLES)
+if(EXAMPLES)
     # Genero ejecutable
     add_executable(Example1 "${PROJECT_SOURCE_DIR}/examples/example1.c")
     # Le digo las librerias que nececita para compilar
